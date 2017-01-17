@@ -24,7 +24,10 @@ Module.register("MMM-MotionEye",{
 	},
 	
 	start: function() {
-		this.motionDetected = false;
+		this.motionDetected = true;
+		if (this.config.autoHide) {
+			this.motionDetected = false;
+		}
 		this.timeOutID == undefined;
 		
 		this.sendSocketNotification('CONFIG', this.config);
@@ -32,15 +35,24 @@ Module.register("MMM-MotionEye",{
 	
 	// Override dom generator.
 	getDom: function() {
+		var wrapper = document.createElement("div");
+		wrapper.classList.add("wrapper", "align-left");
 		if (this.motionDetected) {
+			
+			var header = document.createElement("header");
+			header.classList.add("module-header");
+			header.innerHTML = "You are watching: "+this.config.title;
+			wrapper.appendChild(header);
+			var streamholder = document.createElement("div");
 			var img = document.createElement("img");
 			img.setAttribute("ID", "motionEyeImage");
 			img.src = this.config.url;
 			img.style.width = this.config.width;
-			return img;
+			streamholder.appendChild(img);
+			wrapper.appendChild(streamholder);
 		}
 		
-		return document.createElement("div");
+		return wrapper;
 	},
 	
 	socketNotificationReceived: function(notification, payload) {
